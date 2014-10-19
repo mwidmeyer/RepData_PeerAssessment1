@@ -7,7 +7,7 @@ output:
 
 
 ## Loading and preprocessing the data
-```{r echo = TRUE}
+```{r}
 df <- read.csv("activity.csv")
 ```
 ## What is mean total number of steps taken per day?
@@ -20,9 +20,22 @@ median(df$steps,na.rm=TRUE)
 ```{r}
 activity <- aggregate(df[c("steps")],by=df[c("interval")],FUN=mean,na.rm=TRUE)
 plot(activity,type="l")
+activity[activity$steps==max(activity$steps),"interval"]
 ```
 ## Imputing missing values
-
-
-
+```{r}
+length(which(is.na(df$steps)))
+df2 <- df
+df2$steps <- ifelse(is.na(df2$steps),activity$steps[match(df2$interval, activity$interval)], df2$steps)
+hist(df2$steps)
+mean(df2$steps)
+median(df2$steps)
+```
 ## Are there differences in activity patterns between weekdays and weekends?
+```{r}
+df2$wd <- as.factor(ifelse(weekdays(as.Date(df2$date)) %in% c("Saturday","Sunday"), "Weekend", "Weekday"))
+plot(df2[df2$wd=="Weekend",c("interval","steps")],type="l")
+title("Weekend")
+plot(df2[df2$wd=="Weekday",c("interval","steps")],type="l")
+title("Weekday")
+```
